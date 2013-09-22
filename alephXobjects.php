@@ -18,25 +18,29 @@ class AlephX {
 	protected $marc;
 	
 	// To begin, allow AlephX objects to be created for given types: "barcode", "oclc", "aleph", "callnum", "isbn"	
-	public function __construct($request, $type) {
-		$hostname = $this->hostname;
-		$path = $this->path;
-		$base = $this->base;	
-		// unnecessary $this->request = $request;
+	public function __construct($request, $type) {			
+		
 		foreach ($this->alephcodes as $key => $value) {
 			if ($key == $type) {
 				$code = $value;
 			} // end if
 		} // end foreach
-		$this->findURL = $this->buildFindURL($hostname, $path, $request, $code, $base);	
+		if ($code == "035") {
+			$request = $this->OCLCforAlephX($request);
+		}
+		$this->findURL = $this->buildFindURL($request, $code);	
 		$this->findXML = $this->alephXfind($this->findURL);
-		$setNum = $this->alephXgetSetNum($this->findXML);
-		$this->presentURL = $this->buildPresentURL($hostname, $path, $setNum);
+		$setNum = $this->getSetNum($this->findXML);
+		$this->presentURL = $this->buildPresentURL($setNum);
 		$this->marc = $this->alephXpresent($this->presentURL);
 	} // end __construct
 		
 	// Build a url for use in the alephXfind() function. Requires a $request and a $code (i.e. "BAR")  
-	protected function buildFindURL($hostname, $path, $request, $code, $base, $op = "find") {
+	protected function buildFindURL($request, $code) {
+		$hostname = $this->hostname;
+		$path = $this->path;
+		$base = $this->base;
+		$op = "find";	
 		$findURL = $hostname.$path."request=".$request."&op=find&code=".$code."&base=".$base;
 		return($findURL);
 	} // end buildFindURL
@@ -49,13 +53,24 @@ class AlephX {
 	} // end alephXfind
 	
 	// Returns set number for a result set. Requires $findXML returned from alephXfind()
-	protected function alephXgetSetNum($findXML) {			
+	protected function getSetNum($findXML) {			
 		$setNum = $findXML->set_number;
 		return($setNum);	
-	} // end alephXgetSetNum
+	} // end getSetNum
+	
+	// Tests to see if a set number was returned (i.e. was the search successful)
+	protected function testForSetNum($findXML) {		
+		if ($findXML->set_number) {		
+			return (True);
+		} else {
+			return(False);
+		} // end if	
+	} // end testForSetNum	
 		
-	// Build a url for use in the alephXpresent() function. Requires the $setNum returned by alephXgetSetNum()
-	protected function buildPresentURL($hostname, $path, $setNum, $setEntry = 1) {
+	// Build a url for use in the alephXpresent() function. Requires the $setNum returned by getSetNum()
+	protected function buildPresentURL($setNum, $setEntry = 1) {
+		$hostname = $this->hostname;
+		$path = $this->path;	
 		$presentURL = $hostname.$path."set_no=".$setNum."&set_entry=".$setEntry."&op=present";
 		return($presentURL);
 	} // end buildPresentURL
@@ -65,7 +80,50 @@ class AlephX {
 		$presentResults = file_get_contents($presentURL);
 		$presentXML = new SimpleXMLElement($presentResults);
 		return($presentXML); 
-} // end alephPresent	
+	} // end alephPresent
+			
+	// OCLC numbers have to be 8 digits for sending to Aleph. If less than 8, add zeroes.
+	protected function OCLCpadNum($oclc) {
+		if (strlen($oclc) < 8) {
+			if (strlen($oclc) == 6) {
+				$oclcPad = "00".$oclc;			
+			} elseif (strlen($oclc) == 7) {
+				$oclcPad = "0".$oclc;			
+			} // end if		
+		} else {
+			$oclcPad = $oclc;
+		} // end if
+	return($oclcPad);
+	} // end OCLCpadNum
+	
+		// OCLC nums sent to aleph need to be preceded by "ocn" or "ocm". 
+	protected function OCLCtestPrefix($oclcPad) {
+		$prefix = "ocm";		
+		$oclcPre = $prefix.$oclcPad;	
+		$findURL = $this->buildFindURL($oclcPre, "035");
+		$findXML = $this->alephXfind($findURL);
+		if ($test = $this->testForSetNum($findXML)) {
+			return($oclcPre);		
+		} else {			
+			$prefix = "ocn";		
+			$oclcPre = $prefix.$oclcPad;
+			$findURL = $this->buildFindURL($oclcPre, "035");
+			$findXML = $this->alephXfind($findURL);		
+			if ($test = $this->testForSetNum($findXML)) {
+				return($oclcPre);			
+			} // end if
+		} // end if
+	} // end OCLCtestPrefix
+	
+	// Prepares OCLC number for Aleph-X-services. Pads OCLC nums shorter than 8 digits, and adds proper prefix.
+	protected function OCLCforAlephX($oclc) {
+		$oclcPad = $this->OCLCpadNum($oclc);	
+		$oclcForAlephX = $this->OCLCtestPrefix($oclcPad);	
+		return($oclcForAlephX);
+	} // end OCLCforAlephx
+
+
+	// PUBLIC METHODS
 	
 	// return MARC record for an object
 	public function getMarc() {
@@ -87,13 +145,26 @@ class AlephX {
 		return($this->findXML);
 	} // end getFindXML()
 	
+	public function getPreppedOCLC($oclc) {
+		echo "OCLC num: ".$oclc;
+		echo "\n";
+		$oclcforAleph = $this->OCLCforAlephX($oclc);
+		echo "OCLC num for Aleph: ".$oclcforAleph;
+	} // end getPreppedOCLC
+	
 } // end AlephX object
 
 $book = new AlephX("31430045584994", "barcode");
 $book2 = new AlephX("004320251", "aleph");
 $book3 = new AlephX("MCD28", "callnum");
 //print_r($book3->presentURL);
-print_r($book3->getFindXML());
+// print_r($book3->getMarc());
+
+// oclcnums for testing. one is 7 digits. I think one of the others requires "ocn" prefix, others require "ocm" prefix
+$oclcNums = array ("2648489", "173136007", "428436794", "34919814");
+
+$book4 = new AlephX($oclcNums[3], "oclc");
+print_r($book4->getMarc());
 echo "\n";
 
 ?>
