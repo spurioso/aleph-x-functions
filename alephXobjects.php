@@ -16,6 +16,9 @@ class AlephX {
 	protected $findXML;
 	protected $presentURL;	
 	protected $marc;
+	protected $alephNum;
+	protected $itemDataURL;
+	protected $itemData;
 	
 	// To begin, allow AlephX objects to be created for given types: "barcode", "oclc", "aleph", "callnum", "isbn"	
 	public function __construct($request, $type) {			
@@ -33,6 +36,9 @@ class AlephX {
 		$setNum = $this->getSetNum($this->findXML);
 		$this->presentURL = $this->buildPresentURL($setNum);
 		$this->marc = $this->alephXpresent($this->presentURL);
+		$this->alephNum = $this->getAlephNum();
+		$this->itemDataURL = $this->buildItemDataURL($this->alephNum);
+		$this->itemData = $this->alephXitemData($this->itemDataURL);
 	} // end __construct
 		
 	// Build a url for use in the alephXfind() function. Requires a $request and a $code (i.e. "BAR")  
@@ -81,6 +87,22 @@ class AlephX {
 		$presentXML = new SimpleXMLElement($presentResults);
 		return($presentXML); 
 	} // end alephPresent
+	
+	// Build a url for use in the alephXitemData() function. Requires an Aleph system number ($docNumber)
+	protected function buildItemDataURL($docNumber) {
+		$hostname = $this->hostname;
+		$path = $this->path;
+		$base = $this->base;		
+		$itemDataURL = $hostname.$path."op=item_data&doc_number=".$docNumber."&base=".$base;
+		return ($itemDataURL);	
+	} // end buildItemDataURL
+	
+	// Returns item data. Requires itemDataURL from buildItemDataURL()
+	protected function alephXitemData($itemDataURL){				
+		$itemDataResults = file_get_contents($itemDataURL);
+		$itemDataXML = new SimpleXMLElement($itemDataResults);	
+		return($itemDataXML); 
+	} // end alephItemData
 			
 	// OCLC numbers have to be 8 digits for sending to Aleph. If less than 8, add zeroes.
 	protected function OCLCpadNum($oclc) {
@@ -150,7 +172,13 @@ class AlephX {
 		$sysNum = $this->marc->record->doc_number;
 	return($sysNum);
 
-	} // end getSetNum	
+	} // end getSetNum
+	
+	// Retrieves Aleph item data (call number, locations, etc)
+	public function getItemData() {
+		$itemData = $this->itemData;
+		return($itemData);
+	} // end getItemData	
 	
 } // end AlephX object
 
@@ -164,4 +192,5 @@ $oclcNums = array ("2648489", "173136007", "428436794", "34919814");
 $book4 = new AlephX($oclcNums[3], "oclc");
 $book5 = new AlephX("9780596100674", "isbn");
 
+print_r($book4->getItemData());
 ?>
