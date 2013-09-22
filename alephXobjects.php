@@ -172,13 +172,20 @@ class AlephX {
 		$sysNum = $this->marc->record->doc_number;
 	return($sysNum);
 
-	} // end getSetNum
+	} // end getAlephNum
 	
 	// Retrieves Aleph item data (call number, locations, etc)
 	public function getItemData() {
 		$itemData = $this->itemData;
 		return($itemData);
 	} // end getItemData	
+	
+	public function getAlephURL() {
+		$docNumber = $this->alephNum;	
+		$hostname = $this->hostname;
+		$alephURL = $hostname."/docno=".$docNumber;
+		return($alephURL);	
+	} // end getAlephURL	
 	
 } // end AlephX object
 
@@ -192,5 +199,8 @@ $oclcNums = array ("2648489", "173136007", "428436794", "34919814");
 $book4 = new AlephX($oclcNums[3], "oclc");
 $book5 = new AlephX("9780596100674", "isbn");
 
-print_r($book4->getItemData());
+
+
+echo $book4->getAlephURL();
+echo "\n";
 ?>
