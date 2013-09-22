@@ -185,8 +185,20 @@ class AlephX {
 		$hostname = $this->hostname;
 		$alephURL = $hostname."/docno=".$docNumber;
 		return($alephURL);	
-	} // end getAlephURL	
+	} // end getAlephURL
 	
+	public function getOCLCnum() {
+		$oclcPattern = "/^oc[A-z][0-9]{6,9}$/"; //regular expression pattern for matching oclc numbers (other data can be stored in 035 MARC fields)
+		$xml = $this->marc;
+		foreach ($xml->record->metadata->oai_marc->varfield as $varfield) { //go through each MARC variable field in the result
+    		if ($varfield->attributes()->id == "035") { //Find the 035 fields. see http://www.electrictoolbox.com/php-simplexml-element-attributes/ for accessing element attributes
+        		if (preg_match($oclcPattern, $varfield->subfield)) { //look for 035 fields that store OCLC numbers
+            		$oclcNumber = preg_replace("/^oc[A-z]/", "", $varfield->subfield); //remove the "ocn" or "ocm" prefix and store the oclc number as a variable                                
+        		} // end if       
+    		} // end if		
+		} // end foreach
+		return($oclcNumber);	
+	} // end getOCLCnum
 } // end AlephX object
 
 $book1 = new AlephX("31430045584994", "barcode");
@@ -199,8 +211,6 @@ $oclcNums = array ("2648489", "173136007", "428436794", "34919814");
 $book4 = new AlephX($oclcNums[3], "oclc");
 $book5 = new AlephX("9780596100674", "isbn");
 
-
-
-echo $book4->getAlephURL();
+echo $book4->getOCLCnum();
 echo "\n";
 ?>
