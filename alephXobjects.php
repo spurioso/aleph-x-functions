@@ -12,7 +12,11 @@ class AlephX {
 		"callnum" => "CNL", // note, this is for non-LC call nums
 		"isbn" => "020",
 		);	
+	protected $findURL;
+	protected $findXML;
+	protected $presentURL;	
 	protected $marc;
+	
 	// To begin, allow AlephX objects to be created for given types: "barcode", "oclc", "aleph", "callnum", "isbn"	
 	public function __construct($request, $type) {
 		$hostname = $this->hostname;
@@ -68,11 +72,28 @@ class AlephX {
 		return($this->marc);
 	} // end getMarc()
 	
+	// return findURL for an object
+	public function getFindURL() {
+		return($this->findURL);
+	} // end getFindURL()
+	
+	// return presentURL for an object
+	public function getPresentURL() {
+		return($this->presentURL);
+	} // end getPresentURL()
+	
+	// return findXML for an object
+	public function getFindXML() {
+		return($this->findXML);
+	} // end getFindXML()
+	
 } // end AlephX object
 
 $book = new AlephX("31430045584994", "barcode");
 $book2 = new AlephX("004320251", "aleph");
 $book3 = new AlephX("MCD28", "callnum");
-print_r($book3->getMarc());
+//print_r($book3->presentURL);
+print_r($book3->getFindXML());
+echo "\n";
 
 ?>
