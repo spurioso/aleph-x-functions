@@ -11,7 +11,8 @@ class AlephX {
 		"aleph" => "SYS",
 		"callnum" => "CNL", // note, this is for non-LC call nums
 		"isbn" => "020",
-		);
+		);	
+	protected $marc;
 	// To begin, allow AlephX objects to be created for given types: "barcode", "oclc", "aleph", "callnum", "isbn"	
 	public function __construct($request, $type) {
 		$hostname = $this->hostname;
@@ -56,15 +57,22 @@ class AlephX {
 	} // end buildPresentURL
 	
 	// Returns MarcXML for a record. Default is the first result of a set. Requires the $findURL from alephXbuildFindURL
-	function alephXpresent($presentURL, $setEntry = 1){	
+	protected function alephXpresent($presentURL, $setEntry = 1){	
 		$presentResults = file_get_contents($presentURL);
 		$presentXML = new SimpleXMLElement($presentResults);
 		return($presentXML); 
 } // end alephPresent	
 	
+	// return MARC record for an object
+	public function getMarc() {
+		return($this->marc);
+	} // end getMarc()
+	
 } // end AlephX object
 
 $book = new AlephX("31430045584994", "barcode");
-print_r($book->marc);
+$book2 = new AlephX("004320251", "aleph");
+$book3 = new AlephX("MCD28", "callnum");
+print_r($book3->getMarc());
 
 ?>
