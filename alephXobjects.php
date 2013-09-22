@@ -145,26 +145,23 @@ class AlephX {
 		return($this->findXML);
 	} // end getFindXML()
 	
-	public function getPreppedOCLC($oclc) {
-		echo "OCLC num: ".$oclc;
-		echo "\n";
-		$oclcforAleph = $this->OCLCforAlephX($oclc);
-		echo "OCLC num for Aleph: ".$oclcforAleph;
-	} // end getPreppedOCLC
+	// Returns an Aleph system number	
+	public function getAlephNum() {	
+		$sysNum = $this->marc->record->doc_number;
+	return($sysNum);
+
+	} // end getSetNum	
 	
 } // end AlephX object
 
-$book = new AlephX("31430045584994", "barcode");
+$book1 = new AlephX("31430045584994", "barcode");
 $book2 = new AlephX("004320251", "aleph");
 $book3 = new AlephX("MCD28", "callnum");
-//print_r($book3->presentURL);
-// print_r($book3->getMarc());
 
 // oclcnums for testing. one is 7 digits. I think one of the others requires "ocn" prefix, others require "ocm" prefix
 $oclcNums = array ("2648489", "173136007", "428436794", "34919814");
 
 $book4 = new AlephX($oclcNums[3], "oclc");
-print_r($book4->getMarc());
-echo "\n";
+$book5 = new AlephX("9780596100674", "isbn");
 
 ?>
