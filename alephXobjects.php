@@ -174,6 +174,40 @@ class AlephX {
 
 	} // end getAlephNum
 	
+	// Returns an array of all ISBNs found in the MARC record	
+	public function getISBNsAll() {	
+		$isbnFields = $this->marc->xpath("/present/record/metadata/oai_marc/varfield[@id='020']/subfield[@label='a']");
+		$isbns = array();
+		foreach ($isbnFields as $field) {
+			$isbn = (string)$field[0];
+			array_push($isbns, $isbn);
+		} // end foreach			
+	return($isbns);
+	} // end getISBNsAll
+	
+	// Returns a single ISBN, favoring an ISBN-13 if found	
+	public function getISBNjustOne() {	
+		$isbnFields = $this->marc->xpath("/present/record/metadata/oai_marc/varfield[@id='020']/subfield[@label='a']");
+		$isbns = array();
+		foreach ($isbnFields as $field) {
+			$isbn = (string)$field[0];
+			array_push($isbns, $isbn);
+		} // end foreach
+		if (count($isbns) > 1) {
+			$isbnPattern = "/^97[0-9]{11}$/";
+			foreach ($isbns as $isbn) {
+				if (preg_match($isbnPattern, $isbn)) {
+					$goodISBN = $isbn;
+				} // end if
+			} // end foreach
+		} // end if
+		if ($goodISBN) {
+			return($goodISBN);
+		} else {
+			return($isbns[0]);
+		} // end if	
+	} // end getISBNjustOne
+	
 	// Retrieves Aleph item data (call number, locations, etc)
 	public function getItemData() {
 		$itemData = $this->itemData;
@@ -188,9 +222,9 @@ class AlephX {
 	} // end getAlephURL
 	
 	public function getOCLCnum() {
-		$oclcPattern = "/^oc[A-z][0-9]{6,9}$/"; //regular expression pattern for matching oclc numbers (other data can be stored in 035 MARC fields)
-		$xml = $this->marc;
-		foreach ($xml->record->metadata->oai_marc->varfield as $varfield) { //go through each MARC variable field in the result
+		$oclcPattern = "/^oc[A-z][0-9]{6,9}$/"; //regular expression pattern for matching oclc numbers (other data can be stored in 035 MARC fields)		
+		//$author = $alephMarcXML->xpath("/present/record/metadata/oai_marc/varfield[@id='100']/subfield[@label='a']");
+		foreach ($this->marc->record->metadata->oai_marc->varfield as $varfield) { //go through each MARC variable field in the result
     		if ($varfield->attributes()->id == "035") { //Find the 035 fields. see http://www.electrictoolbox.com/php-simplexml-element-attributes/ for accessing element attributes
         		if (preg_match($oclcPattern, $varfield->subfield)) { //look for 035 fields that store OCLC numbers
             		$oclcNumber = preg_replace("/^oc[A-z]/", "", $varfield->subfield); //remove the "ocn" or "ocm" prefix and store the oclc number as a variable                                
@@ -210,7 +244,33 @@ $oclcNums = array ("2648489", "173136007", "428436794", "34919814");
 
 $book4 = new AlephX($oclcNums[3], "oclc");
 $book5 = new AlephX("9780596100674", "isbn");
+$book6 = new AlephX("0226103897", "isbn");
 
-echo $book4->getOCLCnum();
-echo "\n";
+$books = array($book1, $book2, $book3, $book4, $book5, $book6);
+
+/*
+foreach ($books as $book) {
+	echo $book->getAlephURL();
+	echo "</br>";
+}
+*/
+
+
+print_r($book6->getISBNsAll());
+echo "</br>";
+
+print_r($book5->getISBNsAll());
+echo "</br>";
+
+print_r($book4->getISBNsAll());
+echo "</br>";
+echo "</br>";
+
+echo $book6->getISBNjustOne();
+echo "</br>";
+echo $book5->getISBNjustOne();
+echo "</br>";
+echo $book4->getISBNjustOne();
+echo "</br>";
+
 ?>
