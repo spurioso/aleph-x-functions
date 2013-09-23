@@ -29,8 +29,18 @@ $book->getItemData()
 // retrieve an Aleph system number as text
 $book->getAlephNum()
 
-// these are useful for testing
+// retrieve an OCLC number as text
+$book->getOCLCnum()
 
+// retrieve an array of all ISBNs found in the MARC record
+$book->getISBNsAll();
+
+// retrieve a single ISBN found in the MARC record, favoring an ISBN-13 if available
+$book->getISBNjustOne()
+```
+
+### These are useful for testing
+````
 // retrieve a RESTful URL based your new AlephX parameters, for sending to Aleph X-services. Returns findXML
 $book->getFindURL()
 
