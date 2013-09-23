@@ -29,6 +29,9 @@ $book->getItemData()
 // retrieve an Aleph system number as text
 $book->getAlephNum()
 
+// retrieve a stable URL pointing to the item in the Aleph OPAC
+$book->getAlephURL() 
+
 // retrieve an OCLC number as text
 $book->getOCLCnum()
 
