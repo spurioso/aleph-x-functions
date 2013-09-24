@@ -32,6 +32,9 @@ $book->getAlephNum()
 // retrieve a stable URL pointing to the item in the Aleph OPAC
 $book->getAlephURL() 
 
+// retrieve a permalink to the item in Worldcat UMD
+$book->getWorldcatLink()
+
 // retrieve an OCLC number as text
 $book->getOCLCnum()
 

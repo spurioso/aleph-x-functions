@@ -39,6 +39,7 @@ class AlephX {
 		$this->alephNum = $this->getAlephNum();
 		$this->itemDataURL = $this->buildItemDataURL($this->alephNum);
 		$this->itemData = $this->alephXitemData($this->itemDataURL);
+		$this->oclcNum = $this->getOCLCnum();
 	} // end __construct
 		
 	// Build a url for use in the alephXfind() function. Requires a $request and a $code (i.e. "BAR")  
@@ -233,6 +234,14 @@ class AlephX {
 		} // end foreach
 		return($oclcNumber);	
 	} // end getOCLCnum
+	
+	public function getWorldcatLink() {
+		$oclcnumber = $this->oclcNum;			
+		$permalink = "http://umaryland.worldcat.org/oclc/".$oclcnumber; //build a permalink pointing to WCL out of the OCLC number
+		return($permalink);
+	}
+	
+	
 } // end AlephX object
 
 $book1 = new AlephX("31430045584994", "barcode");
@@ -271,6 +280,8 @@ echo "</br>";
 echo $book5->getISBNjustOne();
 echo "</br>";
 echo $book4->getISBNjustOne();
+echo "</br>";
+echo $book4->getWorldcatLink();
 echo "</br>";
 
 ?>
