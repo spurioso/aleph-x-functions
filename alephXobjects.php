@@ -195,7 +195,7 @@ class AlephX {
 			array_push($isbns, $isbn);
 		} // end foreach
 		if (count($isbns) > 1) {
-			$isbnPattern = "/^97[0-9]{11}$/";
+			$isbnPattern = "/^97[0-9]{11}.*$/";
 			foreach ($isbns as $isbn) {
 				if (preg_match($isbnPattern, $isbn)) {
 					$goodISBN = $isbn;
