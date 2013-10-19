@@ -56,5 +56,8 @@ getFindXML()
 // retrieve a RESTful URL based on set number from getFindXML(), for sending to Aleph X-services
 $book->getPresentURL()
 
+// retrieve a RESTful URL for retrieving item data
+$book->getPresentURL()
+
 ```
 

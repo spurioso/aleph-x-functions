@@ -209,6 +209,12 @@ class AlephX {
 		} // end if	
 	} // end getISBNjustOne
 	
+	// Retrieve Aleph item data URL
+	public function getItemDataURL() {
+		$itemDataURL = $this->itemDataURL;
+		return($itemDataURL);
+	} // end getItemDataURL	
+	
 	// Retrieves Aleph item data (call number, locations, etc)
 	public function getItemData() {
 		$itemData = $this->itemData;
@@ -283,5 +289,9 @@ echo $book4->getISBNjustOne();
 echo "</br>";
 echo $book4->getWorldcatLink();
 echo "</br>";
+
+print_r($book1->getItemData());
+echo "</br>";
+echo $book1->getItemDataURL();
 
 ?>
