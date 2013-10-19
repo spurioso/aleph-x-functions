@@ -43,6 +43,10 @@ $book->getISBNsAll();
 
 // retrieve a single ISBN found in the MARC record, favoring an ISBN-13 if available
 $book->getISBNjustOne()
+
+// retrieve a barcode
+$book->getBarcode();
+
 ```
 
 ### These are useful for testing

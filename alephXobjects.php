@@ -246,6 +246,11 @@ class AlephX {
 		$permalink = "http://umaryland.worldcat.org/oclc/".$oclcnumber; //build a permalink pointing to WCL out of the OCLC number
 		return($permalink);
 	}
+
+	public function getBarcode() {
+		$barcode = $this->itemData->item->barcode;
+		return($barcode);
+	}
 	
 	
 } // end AlephX object
@@ -289,9 +294,28 @@ echo $book4->getISBNjustOne();
 echo "</br>";
 echo $book4->getWorldcatLink();
 echo "</br>";
-
+echo "</br>";
 print_r($book1->getItemData());
 echo "</br>";
+echo "</br>";
 echo $book1->getItemDataURL();
+echo "</br>";
+echo "Barcode: ";
+print_r($book1->getBarcode());
+echo "</br>";
+echo "Barcode: ";
+echo $book1->getBarcode();
+echo "</br>";
+echo $book1->getPresentURL();
+echo "</br>";
+echo "</br>";
+print_r($book1->getFindXML());
+
+foreach ($books as $book) {
+	echo $book->getBarcode();
+	echo "</br>";
+	
+}
+print_r($book5->getMarc());
 
 ?>
