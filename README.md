@@ -51,7 +51,7 @@ $book->getBarcode();
 
 ### These are useful for testing
 
-```
+```php
 // retrieve a RESTful URL based your new AlephX parameters, for sending to Aleph X-services. Returns findXML
 $book->getFindURL()
 
